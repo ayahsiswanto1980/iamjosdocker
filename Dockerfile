@@ -12,8 +12,6 @@ COPY public ./public
 RUN npm run build
 
 # Stage 2: FrankenPHP Production Image
-# FrankenPHP = PHP 8.4 + Caddy (replaces Nginx+FPM). No AIO issues.
-# Officially recommended by Laravel for production containers.
 FROM dunglas/frankenphp:1-php8.4
 
 # Copy Composer from official image (not included in FrankenPHP base)
@@ -62,6 +60,7 @@ RUN chown -R www-data:www-data storage bootstrap/cache && \
 # Production environment
 ENV PHP_OPCACHE_ENABLE=1
 ENV APP_ENV=production
-ENV SERVER_NAME=":${PORT:-8080}"
 
+# FrankenPHP uses Caddyfile by default — no SERVER_NAME env needed
+# Caddy listens on :8080 as defined in Caddyfile
 EXPOSE 8080

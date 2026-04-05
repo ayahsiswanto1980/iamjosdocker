@@ -1,0 +1,18 @@
+{
+	# FrankenPHP global options
+	frankenphp
+	# Disable admin endpoint for production
+	admin off
+}
+
+# Listen on port 8080 (Railway default, no TLS needed — Railway terminates SSL)
+:8080 {
+	# Laravel document root
+	root * /app/public
+
+	# Enable compression
+	encode zstd br gzip
+
+	# Handle PHP files via FrankenPHP
+	php_server
+}
