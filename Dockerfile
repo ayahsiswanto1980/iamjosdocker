@@ -61,7 +61,10 @@ RUN chmod -R 775 storage bootstrap/cache
 # Production environment
 ENV PHP_OPCACHE_ENABLE=1
 ENV AUTORUN_ENABLED=1
-# Set worker_processes via main-context env var (NOT in conf.d which is http context)
 ENV NGINX_WORKER_PROCESSES=1
+# Default port — entrypoint.sh will override NGINX_HTTP_PORT using Railway's $PORT
+ENV PORT=8080
 
+# Railway reads EXPOSE to know what port the app listens on
 EXPOSE 8080
+
