@@ -16,6 +16,9 @@ RUN npm run build
 # Officially recommended by Laravel for production containers.
 FROM dunglas/frankenphp:1-php8.4
 
+# Copy Composer from official image (not included in FrankenPHP base)
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
