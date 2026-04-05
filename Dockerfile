@@ -61,5 +61,7 @@ RUN chmod -R 775 storage bootstrap/cache
 # Production environment
 ENV PHP_OPCACHE_ENABLE=1
 ENV AUTORUN_ENABLED=1
+# Set worker_processes via main-context env var (NOT in conf.d which is http context)
+ENV NGINX_WORKER_PROCESSES=1
 
 EXPOSE 8080
