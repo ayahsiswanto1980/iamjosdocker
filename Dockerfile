@@ -6,24 +6,24 @@ COPY package*.json ./
 # Then force-install the correct Linux/x64 Rollup and LightningCSS binaries
 RUN npm ci && \
     npm install -D @rollup/rollup-linux-x64-gnu lightningcss-linux-x64-gnu --no-save
-COPY vite.config.js ./
-COPY resources ./resources
-COPY public ./public
+COPY . .
 RUN npm run build
 
 # Stage 2: FrankenPHP Production Image
 FROM dunglas/frankenphp:1-php8.4
 
-# Copy Composer from official image (not included in FrankenPHP base)
+# Copy Composer from official image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies (MINIMAL VERSION)
+# Adding --no-install-recommends is CRITICAL here to avoid 800MB+ of extra files
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libpq-dev \
     libpng-dev \
     libzip-dev \
     libicu-dev \
+    unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -37,21 +37,24 @@ RUN install-php-extensions \
     pdo_pgsql \
     opcache
 
-# Set working directory
 WORKDIR /app
 
-# Copy application code
+# Copy dependency files first to leverage Docker cache
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-autoloader
+
+# Copy the rest of the application code
 COPY --chown=www-data:www-data . .
 
 # Copy compiled frontend assets from node-build stage
 COPY --from=node-build --chown=www-data:www-data /app/public/build ./public/build
 
+# Finish composer install (autoloader + scripts)
+RUN composer install --no-dev --optimize-autoloader
+
 # Copy entrypoint script
 COPY --chown=root:root docker/entrypoint.sh /docker-entrypoint.d/entrypoint.sh
 RUN chmod +x /docker-entrypoint.d/entrypoint.sh
-
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
 
 # Set permissions for Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache && \
@@ -61,6 +64,4 @@ RUN chown -R www-data:www-data storage bootstrap/cache && \
 ENV PHP_OPCACHE_ENABLE=1
 ENV APP_ENV=production
 
-# FrankenPHP uses Caddyfile by default — no SERVER_NAME env needed
-# Caddy listens on :8080 as defined in Caddyfile
 EXPOSE 8080
