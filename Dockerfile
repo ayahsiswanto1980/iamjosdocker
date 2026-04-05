@@ -3,9 +3,9 @@ FROM node:20 AS node-build
 WORKDIR /app
 COPY package*.json ./
 # Use 'npm ci' for reproducible, deterministic builds (uses package-lock.json)
-# Then force-install the correct Linux/x64 Rollup binary for Vite
+# Then force-install the correct Linux/x64 Rollup and LightningCSS binaries
 RUN npm ci && \
-    npm install -D @rollup/rollup-linux-x64-gnu --no-save
+    npm install -D @rollup/rollup-linux-x64-gnu lightningcss-linux-x64-gnu --no-save
 COPY vite.config.js ./
 COPY resources ./resources
 COPY public ./public
