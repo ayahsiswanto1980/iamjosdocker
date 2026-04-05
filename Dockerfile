@@ -1,7 +1,6 @@
-# Stage 1: Build frontend assets
-FROM node:20-alpine AS node-build
+# Stage 1: Build frontend assets (Debian-based for stable binary support)
+FROM node:20 AS node-build
 WORKDIR /app
-# Only copy existing config files. tailwind.config.js is not needed for Tailwind v4 by default.
 COPY package*.json vite.config.js ./
 COPY resources ./resources
 COPY public ./public
