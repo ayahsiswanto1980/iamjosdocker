@@ -43,7 +43,9 @@ COPY --chown=www-data:www-data . .
 # Copy compiled assets from node-build stage
 COPY --from=node-build --chown=www-data:www-data /app/public/build ./public/build
 
-# Setup entrypoint script
+# Setup entrypoint and Nginx optimization
+# The image includes /etc/nginx/conf.d/*.conf into the main http block
+COPY --chown=root:root docker/nginx/disable-aio.conf /etc/nginx/conf.d/disable-aio.conf
 COPY --chown=root:root docker/entrypoint.sh /etc/entrypoint.d/entrypoint.sh
 RUN chmod +x /etc/entrypoint.d/entrypoint.sh
 
