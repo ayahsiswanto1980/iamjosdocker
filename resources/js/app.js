@@ -103,6 +103,9 @@ Alpine.magic('toast', () => (message, type = 'success') => {
  * IMPORTANT: When using Livewire 3, Alpine is injected by Livewire itself.
  * We expose Alpine to window so Livewire can detect and reuse our instance.
  * This prevents the "multiple instances" warning.
+ *
+ * We do NOT call Alpine.start() here because Livewire will handle it.
  */
 window.Alpine = Alpine;
-Alpine.start();
+// Alpine.start(); <--- Removed for Livewire 3 compatibility
+

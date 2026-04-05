@@ -6,10 +6,12 @@ echo "Running Entrypoint Script..."
 
 cd /app
 
-# Run migrations
+# Run migrations and seeders
 if [ "$RUN_MIGRATIONS" = "true" ]; then
     echo "Running migrations..."
     php artisan migrate --force
+    echo "Running seeders..."
+    php artisan db:seed --force
 fi
 
 # Production optimizations
