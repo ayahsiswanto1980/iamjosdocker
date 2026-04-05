@@ -2,10 +2,9 @@
 FROM node:20 AS node-build
 WORKDIR /app
 COPY package*.json ./
-# Use 'npm ci' for reproducible, deterministic builds (uses package-lock.json)
-# Then force-install the correct Linux/x64 Rollup and LightningCSS binaries
-RUN npm ci && \
-    npm install -D @rollup/rollup-linux-x64-gnu lightningcss-linux-x64-gnu --no-save
+# For frontend build, we ignore the Windows package-lock.json to avoid native binding mismatches
+# This ensures Tailwind 4 Oxide, LightningCSS, and Rollup get their correct Linux binaries
+RUN rm -f package-lock.json && npm install
 COPY . .
 RUN npm run build
 
