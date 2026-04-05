@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('publications', function (Blueprint $table) {
-            $table->string('url_path')->nullable();
-        });
+        if (!Schema::hasColumn('publications', 'url_path')) {
+            Schema::table('publications', function (Blueprint $table) {
+                $table->string('url_path')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('publications', function (Blueprint $table) {
-            $table->dropColumn('url_path');
-        });
+        if (Schema::hasColumn('publications', 'url_path')) {
+            Schema::table('publications', function (Blueprint $table) {
+                $table->dropColumn('url_path');
+            });
+        }
     }
 };
