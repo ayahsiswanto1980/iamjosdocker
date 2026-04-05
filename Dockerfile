@@ -52,8 +52,15 @@ COPY --from=node-build --chown=www-data:www-data /app/public/build ./public/buil
 RUN composer install --no-dev --optimize-autoloader
 
 # Copy entrypoint script
-COPY --chown=root:root docker/entrypoint.sh /docker-entrypoint.d/entrypoint.sh
-RUN chmod +x /docker-entrypoint.d/entrypoint.sh
+COPY --chown=root:root docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Use the script as entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Default command to start FrankenPHP
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
+
 
 # Set permissions for Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache && \

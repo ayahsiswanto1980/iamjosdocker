@@ -68,3 +68,7 @@ fi
 echo "----------------------------------------------------------------"
 echo "🐘 IAMJOS READY - STARTING FRANKENPHP"
 echo "----------------------------------------------------------------"
+
+# Pass execution to the CMD from Dockerfile
+exec "$@"
+
