@@ -1,18 +1,25 @@
-# Use serversideup/php for a modern, production-ready Laravel image
+# Stage 1: Build frontend assets
+FROM node:20-alpine AS node-build
+WORKDIR /app
+COPY package*.json vite.config.js tailwind.config.js ./
+COPY resources ./resources
+COPY public ./public
+RUN npm install && npm run build
+
+# Stage 2: PHP Production Image
 FROM serversideup/php:8.4-fpm-nginx
 
-# Switch to root to install system dependencies
+# Switch to root for system dependencies & extensions
 USER root
 
-# Install system dependencies including FFmpeg and PHP extensions helper
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libpq-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Use install-php-extensions to handle all PHP extensions correctly
-# especially GD (with JPEG/WebP support), Zip, Intl, etc.
+# Install required PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 RUN install-php-extensions gd zip intl bcmath pcntl pdo_pgsql opcache
 
@@ -22,25 +29,24 @@ WORKDIR /var/www/html
 # Copy application code
 COPY --chown=www-data:www-data . .
 
-# Copy and setup entrypoint script for auto-run on startup
+# Copy compiled assets from node-build stage
+COPY --from=node-build --chown=www-data:www-data /app/public/build ./public/build
+
+# Setup entrypoint script
 COPY --chown=root:root docker/entrypoint.sh /etc/entrypoint.d/entrypoint.sh
 RUN chmod +x /etc/entrypoint.d/entrypoint.sh
 
-# Switch back to the non-root user for Composer and NPM
+# Switch to non-root user for Composer
 USER www-data
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install Node dependencies and build assets
-RUN npm install && npm run build
-
-# Ensure storage and bootstrap/cache permissions are correct
+# Final permission check
 RUN chmod -R 775 storage bootstrap/cache
 
-# Environment variables for production
+# Production environment
 ENV PHP_OPCACHE_ENABLE=1
 ENV AUTORUN_ENABLED=1
 
-# Railway default port
 EXPOSE 8080
