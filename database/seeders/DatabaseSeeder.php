@@ -26,10 +26,13 @@ class DatabaseSeeder extends Seeder
 
             // 3. Portal & Site Content (Public Pages)
             SiteContentSeeder::class,
+            SiteContentBlockSeeder::class,
             PortalSeeder::class,
-
+            DefaultNavigationSeeder::class,
+            
             // 4. Email Templates
             EmailTemplateSeeder::class,
+            NotificationTemplateSeeder::class,
 
             // 5. Sample Journals & Initial Data
             JournalSeeder::class,
