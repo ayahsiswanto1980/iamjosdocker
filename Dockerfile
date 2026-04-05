@@ -2,10 +2,10 @@
 FROM node:20 AS node-build
 WORKDIR /app
 COPY package*.json ./
-RUN rm -f package-lock.json && \
-    npm cache clean --force && \
-    npm install && \
-    npm install -D @rollup/rollup-linux-x64-gnu
+# Use 'npm ci' for reproducible, deterministic builds (uses package-lock.json)
+# Then force-install the correct Linux/x64 Rollup binary for Vite
+RUN npm ci && \
+    npm install -D @rollup/rollup-linux-x64-gnu --no-save
 COPY vite.config.js ./
 COPY resources ./resources
 COPY public ./public
