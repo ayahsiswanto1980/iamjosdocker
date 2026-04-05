@@ -24,9 +24,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    {{-- Alpine.js is bundled by Livewire — do NOT load via CDN to avoid "multiple instances" error --}}
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
