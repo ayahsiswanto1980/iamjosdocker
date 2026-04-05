@@ -1,10 +1,21 @@
-# Stage 1: Build frontend assets (Debian-based for stable binary support)
+# Stage 1: Build frontend assets
 FROM node:20 AS node-build
 WORKDIR /app
-COPY package*.json vite.config.js ./
+
+# Copy package configurations
+COPY package*.json ./
+
+# Remove lock-file, clean cache, install dependencies, and force native rollup binary
+RUN rm -f package-lock.json node_modules && \
+    npm cache clean --force && \
+    npm install && \
+    npm install -D @rollup/rollup-linux-x64-gnu
+
+# Copy source files and build
+COPY vite.config.js ./
 COPY resources ./resources
 COPY public ./public
-RUN npm install && npm run build
+RUN npm run build
 
 # Stage 2: PHP Production Image
 FROM serversideup/php:8.4-fpm-nginx
