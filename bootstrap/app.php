@@ -40,8 +40,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
-        // contoh jika mau auto-apply ke grup API:
-        // $middleware->appendToGroup('api', [ValidateApiKey::class]);
+
+        // Trust Railway's reverse proxy so Laravel generates correct HTTPS URLs.
+        // Railway terminates SSL and forwards requests via HTTP internally.
+        $middleware->trustProxies(at: '*');
     })
     ->withSchedule(function (Schedule $schedule) {
         // Lebih aman pisahkan argumen
